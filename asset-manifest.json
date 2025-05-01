@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.js": "/almjls/static/js/main.0ed26a3e.js",
+    "static/js/983.ab70350a.chunk.js": "/almjls/static/js/983.ab70350a.chunk.js",
+    "static/js/693.f1d099fb.chunk.js": "/almjls/static/js/693.f1d099fb.chunk.js",
+    "static/js/319.e241b1ca.chunk.js": "/almjls/static/js/319.e241b1ca.chunk.js",
+    "index.html": "/almjls/index.html",
+    "main.0ed26a3e.js.map": "/almjls/static/js/main.0ed26a3e.js.map",
+    "983.ab70350a.chunk.js.map": "/almjls/static/js/983.ab70350a.chunk.js.map",
+    "693.f1d099fb.chunk.js.map": "/almjls/static/js/693.f1d099fb.chunk.js.map",
+    "319.e241b1ca.chunk.js.map": "/almjls/static/js/319.e241b1ca.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.0ed26a3e.js"
+  ]
+}
