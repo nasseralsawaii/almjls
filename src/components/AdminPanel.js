@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import html2canvas from 'html2canvas';
 import {
   Box,
   Typography,
@@ -91,49 +92,62 @@ const AdminPanel = () => {
 
   // تصدير إلى PDF
   const exportToPDF = () => {
-    const doc = new jsPDF();
-    
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    // لا تضف خطوط Google Fonts هنا، استخدم الخط الافتراضي فقط
+    // doc.addFont('https://fonts.googleapis.com/css2?family=Tajawal&display=swap', 'Tajawal', 'normal');
+    // doc.setFont('Tajawal');
+    doc.setFont('helvetica'); // الخط الافتراضي
+
     // إضافة العنوان
-    doc.setFont('Helvetica', 'bold');
     doc.setFontSize(18);
-    doc.text('مجلس جعلان العام بحارة الصواويع - سجل الحجوزات', 105, 15, { align: 'center' });
-    
+    doc.text('مجلس جعلان العام بحارة الصواويع - سجل الحجوزات', 200, 15, { align: 'right' });
+
     // إعداد البيانات للجدول
-    const tableColumn = ['المبلغ', 'عدد الأيام', 'إلى', 'من', 'التاريخ', 'رقم الهاتف', 'الاسم', 'نوع المناسبة'];
+    const tableColumn = ['عدد الأيام', 'المبلغ', 'إلى', 'من', 'التاريخ', 'رقم الهاتف', 'نوع المناسبة', 'الاسم'];
     const tableRows = [];
-    
+
     bookings.forEach(booking => {
       const bookingData = [
-        `${booking.fees || 0} ر.ع`,
         booking.days || 1,
+        `${booking.fees || 0} ر.ع`,
         getReadableTime(booking.endTime),
         getReadableTime(booking.startTime),
         booking.date ? moment(booking.date).format('DD/MM/YYYY') : '',
         booking.phone || '',
-        booking.name || '',
-        booking.eventType || ''
+        booking.eventType || '',
+        booking.name || ''
       ];
       tableRows.push(bookingData);
     });
-    
+
     // إنشاء الجدول
     doc.autoTable({
       head: [tableColumn],
       body: tableRows,
       startY: 25,
-      styles: { halign: 'right', font: 'Helvetica' },
+      styles: {
+        halign: 'right',
+        font: 'helvetica',
+        fontSize: 10
+      },
       headStyles: { fillColor: [41, 128, 185], textColor: 255 },
       alternateRowStyles: { fillColor: [240, 240, 240] },
-      margin: { right: 15, left: 15 }
+      margin: { right: 15, left: 15 },
+      theme: 'grid'
     });
-    
+
     // إضافة ملخص المبالغ
     const finalY = doc.lastAutoTable.finalY || 25;
     doc.setFontSize(14);
-    doc.text(`إجمالي المبالغ: ${totalFees} ر.ع`, 190, finalY + 15, { align: 'right' });
-    doc.text(`المبالغ المدفوعة: ${paidFees} ر.ع`, 190, finalY + 25, { align: 'right' });
-    doc.text(`المبالغ غير المدفوعة: ${unpaidFees} ر.ع`, 190, finalY + 35, { align: 'right' });
-    
+    doc.text(`إجمالي المبالغ: ${totalFees} ر.ع`, 200, finalY + 15, { align: 'right' });
+    doc.text(`المبالغ المدفوعة: ${paidFees} ر.ع`, 200, finalY + 25, { align: 'right' });
+    doc.text(`المبالغ غير المدفوعة: ${unpaidFees} ر.ع`, 200, finalY + 35, { align: 'right' });
+
     // حفظ الملف
     doc.save('bookings-report.pdf');
   };
@@ -411,6 +425,15 @@ const AdminPanel = () => {
       
       <Button
         variant="contained"
+        startIcon={<PictureAsPdfIcon />}
+        onClick={exportToImage}
+        sx={{ mb: 2, mr: 2 }}
+      >
+        تصدير PNG
+      </Button>
+      
+      <Button
+        variant="contained"
         startIcon={<BarChartIcon />}
         onClick={() => setShowStats(!showStats)}
         sx={{ mb: 3 }}
@@ -616,3 +639,63 @@ const AdminPanel = () => {
 };
 
 export default AdminPanel;
+
+
+  // تصدير إلى صورة PNG
+  const exportToImage = () => {
+    const tableElement = document.querySelector('.MuiTableContainer-root');
+    if (!tableElement) {
+      alert('لم يتم العثور على جدول الحجوزات');
+      return;
+    }
+  
+    // إظهار رسالة للمستخدم
+    const loadingMessage = document.createElement('div');
+    loadingMessage.style.position = 'fixed';
+    loadingMessage.style.top = '50%';
+    loadingMessage.style.left = '50%';
+    loadingMessage.style.transform = 'translate(-50%, -50%)';
+    loadingMessage.style.padding = '20px';
+    loadingMessage.style.background = 'rgba(0, 0, 0, 0.7)';
+    loadingMessage.style.color = 'white';
+    loadingMessage.style.borderRadius = '5px';
+    loadingMessage.style.zIndex = '9999';
+    loadingMessage.textContent = 'جاري إنشاء الصورة، يرجى الانتظار...';
+    document.body.appendChild(loadingMessage);
+  
+    // تأكد من أن العنصر مرئي تماماً
+    window.scrollTo(0, 0);
+    
+    // تأخير قصير للتأكد من اكتمال عرض العناصر
+    setTimeout(() => {
+      const options = {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: true
+      };
+  
+      html2canvas(tableElement, options).then((canvas) => {
+        document.body.removeChild(loadingMessage);
+        
+        try {
+          const imgData = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.href = imgData;
+          link.download = 'bookings-report.png';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          alert('تم إنشاء الصورة بنجاح!');
+        } catch (error) {
+          console.error('خطأ في حفظ الصورة:', error);
+          alert('حدث خطأ أثناء حفظ الصورة. يرجى المحاولة مرة أخرى.');
+        }
+      }).catch(error => {
+        document.body.removeChild(loadingMessage);
+        console.error('خطأ في إنشاء الصورة:', error);
+        alert('حدث خطأ أثناء إنشاء الصورة. يرجى المحاولة مرة أخرى.');
+      });
+    }, 300);
+  };

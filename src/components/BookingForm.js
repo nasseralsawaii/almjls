@@ -164,18 +164,6 @@ const BookingForm = ({ onSuccess, initialData = {}, isEditing = false }) => {
       <Box component="form" onSubmit={handleSubmit}>
         <Grid container spacing={2}>
 
-          {/* اسم صاحب المناسبة */}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="اسم صاحب المناسبة"
-              fullWidth
-              value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
-              required
-              sx={{ '& .MuiInputBase-input': { textAlign: 'right' } }}
-            />
-          </Grid>
-
           {/* نوع المناسبة */}
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
@@ -194,6 +182,18 @@ const BookingForm = ({ onSuccess, initialData = {}, isEditing = false }) => {
                 ))}
               </Select>
             </FormControl>
+          </Grid>
+
+          {/* اسم صاحب المناسبة */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="اسم صاحب المناسبة"
+              fullWidth
+              value={formData.name}
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
+              required
+              sx={{ '& .MuiInputBase-input': { textAlign: 'right' } }}
+            />
           </Grid>
 
           {/* تفصيل أخرى */}
